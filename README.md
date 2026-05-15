@@ -1,8 +1,15 @@
 # 🛒 Marketly - Modern E-Commerce & Store Management Platform
 
+[![Deploy with Vercel](https://vercel.com/button)](https://marketly.vercel.app)
+
 ![Marketly Banner](https://raw.githubusercontent.com/lucide-react/lucide/main/icons/shopping-cart.svg) <!-- Replace with a real banner if available -->
 
 **Marketly** is a robust, full-stack e-commerce platform designed to empower store owners. Built with **Next.js**, **Tailwind CSS**, and **Firebase**, it provides a seamless experience for both sellers and customers. Sellers can manage their products, track sales via a real-time dashboard, and customize their store branding, while customers enjoy a fast and responsive shopping experience.
+
+---
+
+## 🔗 Live Demo
+Check out the live application here: **[marketly.vercel.app](https://marketly.vercel.app)**
 
 ---
 
