@@ -8,6 +8,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { createOrder, getCoupon } from '@/lib/firebaseDb';
 import { useDispatch } from 'react-redux';
 import { clearCart } from '@/lib/features/cart/cartSlice';
+import { fetchAddresses } from '@/lib/features/address/addressSlice';
+import { useEffect } from 'react';
 
 const OrderSummary = ({ totalPrice, items }) => {
 
@@ -24,6 +26,12 @@ const OrderSummary = ({ totalPrice, items }) => {
     const [showAddressModal, setShowAddressModal] = useState(false);
     const [couponCodeInput, setCouponCodeInput] = useState('');
     const [coupon, setCoupon] = useState('');
+
+    useEffect(() => {
+        if (user) {
+            dispatch(fetchAddresses(user.uid));
+        }
+    }, [user, dispatch]);
 
     const handleCouponCode = async (event) => {
         event.preventDefault();

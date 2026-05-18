@@ -2,8 +2,15 @@
 import { XIcon } from "lucide-react"
 import { useState } from "react"
 import { toast } from "react-hot-toast"
+import { useDispatch } from "react-redux"
+import { addAddress } from "@/lib/features/address/addressSlice"
+import { createAddress } from "@/lib/firebaseDb"
+import { useAuth } from "@/lib/AuthContext"
 
 const AddressModal = ({ setShowAddressModal }) => {
+
+    const dispatch = useDispatch()
+    const { user } = useAuth()
 
     const [address, setAddress] = useState({
         name: '',
@@ -26,7 +33,21 @@ const AddressModal = ({ setShowAddressModal }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        setShowAddressModal(false)
+        if (!user) {
+            toast.error("Please login to save address")
+            return
+        }
+
+        try {
+            const addressData = { ...address, userId: user.uid }
+            const addressId = await createAddress(addressData)
+            dispatch(addAddress({ id: addressId, ...addressData }))
+            toast.success("Address added successfully")
+            setShowAddressModal(false)
+        } catch (error) {
+            console.error("Error saving address:", error)
+            toast.error("Failed to save address")
+        }
     }
 
     return (
