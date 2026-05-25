@@ -3,7 +3,7 @@ import StoreInfo from "@/components/admin/StoreInfo"
 import Loading from "@/components/Loading"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import { getAllStores, updateStore, getUser } from "@/lib/firebaseDb"
+import { getStoresByStatus, updateStore, getUser } from "@/lib/firebaseDb"
 
 export default function AdminApprove() {
 
@@ -12,9 +12,7 @@ export default function AdminApprove() {
 
     const fetchStores = async () => {
         try {
-            const allStores = await getAllStores()
-            // Only show pending stores
-            const pendingStores = allStores.filter(s => s.status === 'pending')
+            const pendingStores = await getStoresByStatus('pending')
             // Attach user info
             const storesWithUser = await Promise.all(
                 pendingStores.map(async (store) => {

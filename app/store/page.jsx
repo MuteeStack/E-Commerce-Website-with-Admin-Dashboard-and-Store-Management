@@ -34,29 +34,19 @@ export default function Dashboard() {
             const store = await getStoreByUserId(user.uid)
             if (!store) return setLoading(false)
 
-            const [products, orders, allRatings] = await Promise.all([
+            const [products, orders] = await Promise.all([
                 getProductsByStore(store.id),
                 getOrdersByStore(store.id),
-                getAllRatings(),
             ])
 
-            const storeProductIds = products.map(p => p.id)
-            const storeRatings = allRatings.filter(r => storeProductIds.includes(r.productId))
-
-            // Enrich ratings with user and product info
-            const enrichedRatings = await Promise.all(
-                storeRatings.slice(0, 20).map(async (rating) => {
-                    const [ratingUser, product] = await Promise.all([
-                        getUser(rating.userId),
-                        getProduct(rating.productId),
-                    ])
-                    return {
-                        ...rating,
-                        user: ratingUser || { name: 'Unknown', image: '' },
-                        product: product || { name: 'Unknown', category: '' },
-                    }
-                })
-            )
+            // Extract and flatten ratings from products (they are already enriched with user info in createRating)
+            const storeRatings = products.flatMap(product => 
+                (product.rating || []).map(r => ({
+                    ...r,
+                    productId: product.id,
+                    product: { id: product.id, name: product.name, category: product.category }
+                }))
+            ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
             const totalEarnings = orders.reduce((acc, o) => acc + (o.total || 0), 0)
 
@@ -64,7 +54,7 @@ export default function Dashboard() {
                 totalProducts: products.length,
                 totalEarnings: totalEarnings.toFixed(2),
                 totalOrders: orders.length,
-                ratings: enrichedRatings,
+                ratings: storeRatings.slice(0, 20),
             })
         } catch (err) {
             console.error("Error fetching dashboard:", err)

@@ -1,5 +1,5 @@
 'use client'
-import { Package, Search, ShoppingCart, LogOut, UserIcon, Store, ShieldAlert } from "lucide-react";
+import { Package, Search, ShoppingCart, LogOut, UserIcon, Store, ShieldAlert, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -10,12 +10,13 @@ import { getStoreByUserId } from "@/lib/firebaseDb";
 
 const Navbar = () => {
 
-    const { user, logout } = useAuth();
+    const { user, loading: authLoading, logout } = useAuth();
     const router = useRouter();
 
     const [search, setSearch] = useState('')
     const [showLoginModal, setShowLoginModal] = useState(false)
     const [showUserMenu, setShowUserMenu] = useState(false)
+    const [showMobileMenu, setShowMobileMenu] = useState(false)
     const cartCount = useSelector(state => state.cart.total)
 
     const [isAdmin, setIsAdmin] = useState(false)
@@ -61,7 +62,7 @@ const Navbar = () => {
                 <div className="mx-6">
                     <div className="flex items-center justify-between max-w-7xl mx-auto py-4  transition-all">
 
-                        <Link href="/" className="relative text-4xl font-semibold text-slate-700">
+                        <Link href="/" className="relative text-2xl sm:text-4xl font-semibold text-slate-700">
                             <span className="text-teal-600">Mar</span>ketly<span className="text-teal-600 text-5xl leading-0">.</span>
                             <p className="absolute text-xs font-semibold -top-1 -right-8 px-3 p-0.5 rounded-full flex items-center gap-2 text-white bg-teal-500">
                                 plus
@@ -72,8 +73,8 @@ const Navbar = () => {
                         <div className="hidden sm:flex items-center gap-4 lg:gap-8 text-slate-600">
                             <Link href="/">Home</Link>
                             <Link href="/shop">Shop</Link>
-                            <Link href="/">About</Link>
-                            <Link href="/">Contact</Link>
+                            <Link href="/about">About</Link>
+                            <Link href="/contact">Contact</Link>
 
                             <form onSubmit={handleSearch} className="hidden xl:flex items-center w-xs text-sm gap-2 bg-slate-100 px-4 py-3 rounded-full">
                                 <Search size={18} className="text-slate-600" />
@@ -98,7 +99,9 @@ const Navbar = () => {
                                 Cart
                                 <button className="absolute -top-1 left-3 text-[8px] text-white bg-slate-600 size-3.5 rounded-full">{cartCount}</button>
                             </Link>
-                            {   !user ? (
+                            {   authLoading ? (
+                                    <div className="w-20 h-9 bg-slate-100 animate-pulse rounded-full"></div>
+                                ) : !user ? (
                                     <button onClick={() => setShowLoginModal(true)} className="px-8 py-2 bg-indigo-500
                                     hover:bg-indigo-600 transition text-white rounded-full">
                                         Login
@@ -151,7 +154,9 @@ const Navbar = () => {
                                 <button className="absolute -top-1 left-3 text-[8px] text-white bg-slate-600 size-3.5 rounded-full">{cartCount}</button>
                             </Link>
 
-                            {user ? (
+                            {authLoading ? (
+                                <div className="w-8 h-8 bg-slate-100 animate-pulse rounded-full"></div>
+                            ) : user ? (
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowUserMenu(!showUserMenu)}
@@ -192,11 +197,45 @@ const Navbar = () => {
                                 Login
                             </button>
                             )}
+
+                            <button onClick={() => setShowMobileMenu(true)} className="text-slate-600 p-1">
+                                <Menu size={24} />
+                            </button>
                            
                         </div>
                     </div>
                 </div>
                 <hr className="border-gray-300" />
+
+                {/* Mobile Navigation Drawer */}
+                <div className={`fixed inset-0 z-50 bg-white transition-transform duration-300 ${showMobileMenu ? 'translate-x-0' : 'translate-x-full'} sm:hidden`}>
+                    <div className="flex flex-col h-full">
+                        <div className="flex items-center justify-between p-6 border-b">
+                            <span className="text-2xl font-semibold text-slate-700">Menu</span>
+                            <button onClick={() => setShowMobileMenu(false)} className="text-slate-600">
+                                <X size={24} />
+                            </button>
+                        </div>
+                        
+                        <div className="flex flex-col gap-1 p-6">
+                            <Link href="/" onClick={() => setShowMobileMenu(false)} className="py-4 text-lg text-slate-600 border-b border-slate-50">Home</Link>
+                            <Link href="/shop" onClick={() => setShowMobileMenu(false)} className="py-4 text-lg text-slate-600 border-b border-slate-50">Shop</Link>
+                            <Link href="/about" onClick={() => setShowMobileMenu(false)} className="py-4 text-lg text-slate-600 border-b border-slate-50">About</Link>
+                            <Link href="/contact" onClick={() => setShowMobileMenu(false)} className="py-4 text-lg text-slate-600 border-b border-slate-50">Contact</Link>
+                            
+                            <form onSubmit={(e) => { handleSearch(e); setShowMobileMenu(false); }} className="mt-6 flex items-center w-full text-sm gap-2 bg-slate-100 px-4 py-3 rounded-xl">
+                                <Search size={18} className="text-slate-600" />
+                                <input 
+                                    className="w-full bg-transparent outline-none placeholder-slate-600" 
+                                    type="text" 
+                                    placeholder="Search products" 
+                                    value={search} 
+                                    onChange={(e) => setSearch(e.target.value)} 
+                                />
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </nav>
 
             {/* Login Modal */}

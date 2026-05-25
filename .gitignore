@@ -48,3 +48,16 @@ next-env.d.ts
 /app/generated/prisma
 
 .vercel
+
+# Firebase credentials and configs
+*-firebase-adminsdk-*.json
+firebase-credentials.json
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+.firebaserc
+
+# Ignore MJS scripts but keep essential config files
+*.mjs
+!next.config.mjs
+!postcss.config.mjs
